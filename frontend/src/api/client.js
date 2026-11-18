@@ -104,3 +104,84 @@ export async function fetchDashboardStats() {
   }
   return data;
 }
+
+// --- Milestone 2 API Methods ---
+
+export async function predictPlacementReadiness(profile) {
+  const res = await fetch(`${API_BASE_URL}/prediction/placement-readiness`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(profile),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to evaluate placement readiness');
+  }
+  return data;
+}
+
+export async function rankCandidatesAgainstJD({ jobTitle, jobDescription, candidates }) {
+  const res = await fetch(`${API_BASE_URL}/recruiter/rank-resumes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      job_title: jobTitle,
+      job_description: jobDescription,
+      candidates: candidates,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to rank candidates');
+  }
+  return data;
+}
+
+export async function fetchOpportunities(cgpa = 7.5, branch = 'Computer Science and Engineering') {
+  const res = await fetch(`${API_BASE_URL}/opportunities/?cgpa=${cgpa}&branch=${encodeURIComponent(branch)}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to fetch opportunities');
+  }
+  return data;
+}
+
+export async function checkOpportunityEligibility(profile) {
+  const res = await fetch(`${API_BASE_URL}/opportunities/check-eligibility`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(profile),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to check eligibility');
+  }
+  return data;
+}
+
+export async function fetchInterviewPrepGuide(opportunityId) {
+  const res = await fetch(`${API_BASE_URL}/opportunities/prep-guide/${opportunityId}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to fetch prep guide');
+  }
+  return data;
+}
+
+export async function sendChatMessage({ message, contextSkills = [], contextCgpa = 7.5, contextTargetJob = '' }) {
+  const res = await fetch(`${API_BASE_URL}/chat/message`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message,
+      context_skills: contextSkills,
+      context_cgpa: contextCgpa,
+      context_target_job: contextTargetJob,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to send chat message');
+  }
+  return data;
+}

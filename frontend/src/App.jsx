@@ -7,6 +7,10 @@ import JobMatching from './pages/JobMatching';
 import SkillGapAnalysis from './pages/SkillGapAnalysis';
 import AnalysisHistory from './pages/AnalysisHistory';
 import AboutCareerFit from './pages/AboutCareerFit';
+import PlacementPrediction from './pages/PlacementPrediction';
+import RecruiterComparison from './pages/RecruiterComparison';
+import OpportunityIntelligence from './pages/OpportunityIntelligence';
+import CareerChatbot from './pages/CareerChatbot';
 import { checkBackendHealth } from './api/client';
 
 export default function App() {
@@ -75,6 +79,31 @@ export default function App() {
             <SkillGapAnalysis 
               matchingResult={matchingResult} 
               setActiveTab={setActiveTab}
+            />
+          )}
+
+          {activeTab === 'prediction' && (
+            <PlacementPrediction 
+              resumeData={resumeData} 
+              setActiveTab={setActiveTab} 
+            />
+          )}
+
+          {activeTab === 'opportunities' && (
+            <OpportunityIntelligence 
+              resumeData={resumeData} 
+              setActiveTab={setActiveTab} 
+            />
+          )}
+
+          {activeTab === 'recruiter' && (
+            <RecruiterComparison />
+          )}
+
+          {activeTab === 'chatbot' && (
+            <CareerChatbot 
+              resumeData={resumeData} 
+              matchingResult={matchingResult} 
             />
           )}
 

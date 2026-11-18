@@ -8,13 +8,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.core.config import settings
 from backend.app.core.database import init_db
-from backend.app.routers import resumes, jobs, matching, history
+from backend.app.routers import (
+    resumes,
+    jobs,
+    matching,
+    history,
+    prediction,
+    recruiter,
+    opportunities,
+    chat
+)
 
 # Initialize FastAPI application
 app = FastAPI(
     title=settings.APP_NAME,
-    version=settings.APP_VERSION,
-    description="CareerFit: AI-Based Career Intelligence & Job Matching System (Milestone 1 API)"
+    version="2.0.0",
+    description="CareerFit: AI-Based Career Intelligence & Job Matching System (Milestone 2 API)"
 )
 
 # Configure Cross-Origin Resource Sharing (CORS)
@@ -46,6 +55,10 @@ app.include_router(resumes.router, prefix=settings.API_PREFIX)
 app.include_router(jobs.router, prefix=settings.API_PREFIX)
 app.include_router(matching.router, prefix=settings.API_PREFIX)
 app.include_router(history.router, prefix=settings.API_PREFIX)
+app.include_router(prediction.router, prefix=settings.API_PREFIX)
+app.include_router(recruiter.router, prefix=settings.API_PREFIX)
+app.include_router(opportunities.router, prefix=settings.API_PREFIX)
+app.include_router(chat.router, prefix=settings.API_PREFIX)
 
 if __name__ == "__main__":
     import uvicorn

@@ -149,5 +149,127 @@ def test_database_persistence():
     metrics = get_dashboard_metrics()
     assert metrics is not None
 
+# Test 6: Placement Readiness Prediction Engine (Milestone 2 - Points 4 & 10)
+def test_placement_readiness_prediction():
+    from backend.app.services.prediction_engine import evaluate_placement_readiness
+    from backend.app.models.schemas import PlacementPredictionRequest
+
+    # High readiness profile
+    high_profile = PlacementPredictionRequest(
+        name="Alex Rivera",
+        branch="Computer Science and Engineering",
+        cgpa=8.8,
+        technical_skills=["python", "fastapi", "docker", "sql", "git", "react", "algorithms"],
+        aptitude_score=85.0,
+        projects_count=3,
+        internships_count=1,
+        communication_rating=4.5
+    )
+    res_high = evaluate_placement_readiness(high_profile)
+    assert 0.0 <= res_high.readiness_score <= 100.0
+    assert res_high.readiness_score >= 80.0
+    assert res_high.readiness_band == "High Placement Readiness"
+    assert len(res_high.dimensions) == 6
+    assert len(res_high.strengths) > 0
+    assert len(res_high.actionable_prep_strategy) > 0
+
+    # Low readiness profile
+    low_profile = PlacementPredictionRequest(
+        name="Junior Student",
+        branch="Civil Engineering",
+        cgpa=5.8,
+        technical_skills=["c"],
+        aptitude_score=40.0,
+        projects_count=0,
+        internships_count=0,
+        communication_rating=2.5
+    )
+    res_low = evaluate_placement_readiness(low_profile)
+    assert res_low.readiness_score < 60.0
+    assert res_low.readiness_band == "Foundation Building Phase"
+    assert len(res_low.critical_improvements) > 0
+
+# Test 7: Recruiter Multi-Resume Ranking Engine (Milestone 2 - Point 9)
+def test_recruiter_multi_resume_ranking():
+    from backend.app.services.recruiter_ranker import rank_candidates_against_jd
+    from backend.app.models.schemas import RecruiterRankingRequest, CandidateInput
+
+    req = RecruiterRankingRequest(
+        job_title="Full Stack Python Engineer",
+        job_description="Seeking a Full Stack Engineer with strong experience in Python, FastAPI, React, SQL, and Docker.",
+        candidates=[
+            CandidateInput(
+                name="Candidate Strong",
+                resume_text="Senior engineer skilled in Python, FastAPI, React, SQL, Docker, and Git. Built microservices."
+            ),
+            CandidateInput(
+                name="Candidate Moderate",
+                resume_text="Junior student with basic HTML, CSS, JavaScript, and introductory Python."
+            ),
+            CandidateInput(
+                name="Candidate Weak",
+                resume_text="Accountant with experience in Excel, Bookkeeping, and Financial Auditing."
+            )
+        ]
+    )
+    res = rank_candidates_against_jd(req)
+    assert res.total_evaluated == 3
+    assert len(res.ranked_candidates) == 3
+    # Verifying descending ranking
+    assert res.ranked_candidates[0].rank == 1
+    assert res.ranked_candidates[0].name == "Candidate Strong"
+    assert res.ranked_candidates[0].match_score > res.ranked_candidates[1].match_score
+    assert res.ranked_candidates[1].match_score >= res.ranked_candidates[2].match_score
+    assert res.ranked_candidates[0].match_tier in ["Strong Match", "Good Match"]
+
+# Test 8: Opportunity Intelligence & Eligibility (Milestone 2 - Points 11-14)
+def test_opportunity_intelligence():
+    from backend.app.services.opportunity_service import (
+        get_active_opportunities,
+        generate_interview_prep_guide
+    )
+    from backend.app.models.schemas import OpportunityEligibilityRequest
+
+    profile = OpportunityEligibilityRequest(
+        cgpa=8.2,
+        branch="Computer Science and Engineering",
+        skills=["python", "java", "sql", "git"]
+    )
+    res = get_active_opportunities(profile)
+    assert res.total_opportunities >= 4
+    assert res.eligible_count > 0
+
+    # Test Interview Prep Guide Generation
+    guide = generate_interview_prep_guide("opp_01")
+    assert guide.company == "Amazon"
+    assert len(guide.core_technical_topics) > 0
+    assert len(guide.sample_coding_questions) > 0
+    assert len(guide.revision_schedule_48h) == 4
+
+# Test 9: CareerFit AI Assistant Chatbot (Milestone 2 - Points 16 & 17)
+def test_career_assistant_chatbot():
+    from backend.app.services.chatbot_service import handle_chat_query
+    from backend.app.models.schemas import ChatMessageRequest
+
+    # Test opportunities query
+    chat_opp = handle_chat_query(ChatMessageRequest(message="What opportunities do I have this week?"))
+    assert "Amazon" in chat_opp.reply or "Microsoft" in chat_opp.reply or "deadline" in chat_opp.reply.lower()
+    assert len(chat_opp.suggestions) > 0
+
+    # Test ATS advice query
+    chat_ats = handle_chat_query(ChatMessageRequest(message="How do I improve my ATS resume score?"))
+    assert "XYZ" in chat_ats.reply or "heading" in chat_ats.reply.lower() or "quantify" in chat_ats.reply.lower()
+
+# Test 10: Enriched Course & Skill Pathway Recommendations (Milestone 2 - Point 15)
+def test_enriched_course_recommendations():
+    from backend.app.services.gap_analyzer import generate_skill_gap_suggestions
+
+    suggestions = generate_skill_gap_suggestions(["docker", "react", "sql"])
+    assert len(suggestions) == 3
+    for s in suggestions:
+        assert "recommended_course" in s
+        assert "estimated_effort" in s
+        assert "practice_project" in s
+
 if __name__ == "__main__":
     pytest.main(["-v", __file__])

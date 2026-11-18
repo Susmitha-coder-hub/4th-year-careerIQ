@@ -142,16 +142,21 @@ export default function SkillGapAnalysis({ matchingResult, setActiveTab }) {
         </div>
       </div>
 
-      {/* Practical Actionable Suggestions */}
+      {/* Practical Actionable Suggestions & Course Recommendations (Milestone 2 - Point 15) */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
-        <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-          <Lightbulb size={16} className="text-amber-500" />
-          <span>Practical Action Plan for Identified Gaps</span>
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+            <Lightbulb size={16} className="text-amber-500" />
+            <span>Course & Skill Pathway Recommendations (Point 15)</span>
+          </h3>
+          <span className="text-[11px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200">
+            Curated Upskilling Roadmaps
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {suggestions.map((sug, idx) => (
-            <div key={idx} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
+            <div key={idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 hover:border-indigo-300 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800">{sug.skill}</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">
@@ -161,6 +166,25 @@ export default function SkillGapAnalysis({ matchingResult, setActiveTab }) {
               <p className="text-xs text-slate-600 leading-relaxed">
                 {sug.action || sug.message}
               </p>
+              {sug.recommended_course && (
+                <div className="pt-2 border-t border-slate-200 space-y-1 text-[11px]">
+                  <div className="flex items-start space-x-1.5 text-indigo-700 font-medium">
+                    <Bookmark size={13} className="shrink-0 mt-0.5" />
+                    <span><strong>Course:</strong> {sug.recommended_course}</span>
+                  </div>
+                  {sug.estimated_effort && (
+                    <div className="flex items-center space-x-1.5 text-slate-500">
+                      <TrendingUp size={13} className="shrink-0" />
+                      <span><strong>Effort:</strong> {sug.estimated_effort}</span>
+                    </div>
+                  )}
+                  {sug.practice_project && (
+                    <div className="text-slate-600 bg-white p-2 rounded border border-slate-100 text-[11px]">
+                      <strong>Hands-on Project:</strong> {sug.practice_project}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
