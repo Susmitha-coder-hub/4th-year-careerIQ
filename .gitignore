@@ -11,6 +11,20 @@ venv/
 # Streamlit
 .streamlit/
 
+# Environment variables & secrets
+.env
+.env.*
+*.env
+
+# SQLite databases
+*.sqlite3
+
+# IDE & Editor folders
+.cursor/
+.vscode/
+.idea/
+
 # OS generated
 .DS_Store
 Thumbs.db
+

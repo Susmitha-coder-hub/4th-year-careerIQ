@@ -197,36 +197,42 @@ with tab_resume:
         ats = res["ats_score"]
         contact = res["contact_info"]
 
-        # Top Metric Cards
-        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-        with col_m1:
+        # Top Metric Visualization
+        col_gauge, col_skills = st.columns([1, 2])
+        # --- Circular ATS Score Gauge ---
+        with col_gauge:
             st.markdown(f"""
-            <div class="metric-card">
-                <div style="font-size: 0.9rem; color: #64748b;">Overall ATS Score</div>
-                <div class="score-badge">{ats['total_score']}<span style="font-size:1.2rem; color:#94a3b8;">/100</span></div>
+            <style>
+            .circular-gauge {{ position: relative; width: 150px; height: 150px; margin: auto; }}
+            .circular-gauge svg {{ transform: rotate(-90deg); }}
+            .circular-gauge circle {{ fill: none; stroke-width: 12; stroke-linecap: round; }}
+            .bg-circle {{ stroke: #e5e7eb; }}
+            .progress-circle {{ stroke: #3b82f6; transition: stroke-dashoffset 0.5s; }}
+            .gauge-text {{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                           font-size: 1.4rem; font-weight: 600; color: #1e3a8a; }}
+            </style>
+            <div class="circular-gauge">
+                <svg viewBox="0 0 100 100">
+                    <circle class="bg-circle" cx="50" cy="50" r="45" />
+                    <circle class="progress-circle" cx="50" cy="50" r="45"
+                        stroke-dasharray="283" stroke-dashoffset="{283 - (ats['total_score']/100)*283}" />
+                </svg>
+                <div class="gauge-text">{ats['total_score']}/100</div>
             </div>
             """, unsafe_allow_html=True)
-        with col_m2:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div style="font-size: 0.9rem; color: #64748b;">Detected Skills</div>
-                <div class="score-badge">{len(res['skills'])}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_m3:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div style="font-size: 0.9rem; color: #64748b;">Word Count</div>
-                <div class="score-badge">{ats['word_count']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_m4:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div style="font-size: 0.9rem; color: #64748b;">Sections Found</div>
-                <div class="score-badge">{sum(1 for v in res['sections'].values() if v)}<span style="font-size:1.2rem; color:#94a3b8;">/5</span></div>
-            </div>
-            """, unsafe_allow_html=True)
+        # --- Skill Category Bar Charts ---
+        with col_skills:
+            st.subheader("⚙️ Skill Coverage by Category")
+            from utils.skill_database import SKILL_CATEGORIES
+            total_per_category = {cat: len(skills) for cat, skills in SKILL_CATEGORIES.items()}
+            detected_counts = {cat: len(res["categorized_skills"].get(cat, [])) for cat in SKILL_CATEGORIES}
+            for cat in sorted(SKILL_CATEGORIES.keys()):
+                total = total_per_category[cat]
+                detected = detected_counts.get(cat, 0)
+                perc = int((detected/total)*100) if total else 0
+                st.write(f"**{cat}** ({detected}/{total})")
+                st.progress(perc)
+
 
         st.write("")
         
